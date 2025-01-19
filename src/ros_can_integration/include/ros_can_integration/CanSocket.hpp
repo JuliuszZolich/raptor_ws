@@ -16,26 +16,32 @@
 class CanSocket
 {
 public:
-	/// @brief Creates a managed can socket
-	/// @param interfaceName A CAN (network) interface name.
-	/// @param awaitMessageTimeout A timeout for awaiting for a message in seconds.
+  	/**
+	 * @brief Creates a managed can socket
+	 * @param interfaceName A CAN (network) interface name.
+	 * @param awaitMessageTimeout A timeout for awaiting for a message in seconds.
+	*/
 	CanSocket(std::string interfaceName, uint32_t awaitMessageTimeoutSec = 0, uint32_t awaitMessageTimeoutUsec = 1000);
 
 	~CanSocket();
 
 	void setFilter(canid_t id, canid_t mask);
 
-	/// @brief Sends message over CAN via socket
-	/// @param frame A whole frame that is ready to send.
-	/// @param frame_id CAN message ID. Beware, it also represents priority.
-	/// @param frame_len Payload lenght in bytes. Up to 8.
-	/// @param raw Payload
-	/// @return The number of bytes written, or -1, -2 on error
+    /**
+     * @brief Sends message over CAN via socket
+     * @param frame A whole frame that is ready to send.
+     * @param frame_id CAN message ID. Beware, it also represents priority.
+     * @param frame_len Payload lenght in bytes. Up to 8.
+     * @param raw Payload
+     * @return The number of bytes written, or -1, -2 on error
+	*/
 	int sendMessage(canid_t frame_id, uint8_t frame_len, uint8_t raw[CAN_MAX_DLEN]);
 
-	/// @brief Sends message over CAN via socket
-	/// @param frame A whole frame that is ready to send.
-	/// @return The number of bytes written, or -1, -2 on error
+    /**
+     * @brief Sends message over CAN via socket
+     * @param frame A whole frame that is ready to send.
+     * @return The number of bytes written, or -1, -2 on error
+   	*/
 	int sendMessage(const can_frame &frame);
 
 	/**
@@ -74,19 +80,28 @@ public:
 	std::string translateInitError();
 
 private:
+	/**
+	 * @brief Tries to create a CAN socket.
+	 * @return 0 on success, negative error code on failure.
+	 */
 	int tryCreateSocket();
+
+	/**
+	 * @brief Tries to handle a socket error.
+	 * @return 0 on success, negative error code on failure.
+	 */
 	int tryHandleError();
 
 private:
-	size_t mMaxIterCount;
-	std::string mInterfaceName;
-	int mSocket = 0;
-	int mInitErrCode = -69;
-	uint32_t mSeqCnt = 0;
-	timeval mAwaitMessageTimeout;
-	ros::Time mSocketCreatedTimestamp;
-	ros::Duration mSocketMinimumLifetime;
-	uint32_t sendErrStreak = 0;
+	size_t mMaxIterCount; ///< Maximum iteration count for error handling.
+	std::string mInterfaceName; ///< The name of the CAN interface.
+	int mSocket = 0; ///< The CAN socket file descriptor.
+	int mInitErrCode = -69; ///< Initialization error code.
+	uint32_t mSeqCnt = 0; ///< Sequence counter for messages.
+	timeval mAwaitMessageTimeout; ///< Timeout for awaiting a message.
+	ros::Time mSocketCreatedTimestamp; ///< Timestamp when the socket was created.
+	ros::Duration mSocketMinimumLifetime; ///< Minimum lifetime of the socket.
+	uint32_t sendErrStreak = 0; ///< Streak counter for send errors.
 };
 
 #endif

@@ -12,38 +12,69 @@ extern "C"
 #include <libVescCan/VESC.h>
 }
 
+/**
+ * @brief Class for forwarding probe status using CAN messages.
+ */
 class ProbeStatusForwarder
 {
 public:
-	ProbeStatusForwarder(ros::NodeHandle& nh);
+    /**
+     * @brief Constructor for ProbeStatusForwarder.
+     * @param nh The ROS NodeHandle.
+     */
+    ProbeStatusForwarder(ros::NodeHandle& nh);
 
 private:
-	void probeStatusGrabber(const can_msgs::Frame::ConstPtr &frame);
-	void statusPublisher();
+    /**
+     * @brief Callback to grab probe status from CAN messages.
+     * @param frame The received CAN frame.
+     */
+    void probeStatusGrabber(const can_msgs::Frame::ConstPtr &frame);
 
-	void newStatus8(VESC_Status_8& status8);
-	void newStatus9(VESC_Status_9& status9);
+    /**
+     * @brief Publishes the status of the probe.
+     */
+    void statusPublisher();
 
-	void warnRotten(int statusNum);
-	void infoNotRotten();
+    /**
+     * @brief Updates the status with new VESC status 8 data.
+     * @param status8 The new VESC status 8 data.
+     */
+    void newStatus8(VESC_Status_8& status8);
 
+    /**
+     * @brief Updates the status with new VESC status 9 data.
+     * @param status9 The new VESC status 9 data.
+     */
+    void newStatus9(VESC_Status_9& status9);
 
-	const uint8_t ROTTEN_THRESHOLD = 10;
+    /**
+     * @brief Logs a warning if the status is considered rotten.
+     * @param statusNum The status number to check.
+     */
+    void warnRotten(int statusNum);
 
-	ros::NodeHandle mNh;
+    /**
+     * @brief Logs an info message if the status is not rotten.
+     */
+    void infoNotRotten();
 
-	bool mRottenNoted = false;
+    const uint8_t ROTTEN_THRESHOLD = 10; ///< Threshold for considering the status as rotten.
 
-	VESC_Status_8 mStatus8;
-	bool mStatus8Fresh = false;
-	uint8_t mStatus8Staleness = 0;
+    ros::NodeHandle mNh; ///< ROS NodeHandle.
 
-	VESC_Status_9 mStatus9;
-	bool mStatus9Fresh = false;
-	uint8_t mStatus9Staleness = 0;
+    bool mRottenNoted = false; ///< Flag to indicate if rotten status has been noted.
 
-	ros::Subscriber mProbeStatusGrabber;
-	ros::Publisher mProbeStatusPublisher;	
+    VESC_Status_8 mStatus8; ///< VESC status 8 data.
+    bool mStatus8Fresh = false; ///< Flag to indicate if status 8 data is fresh.
+    uint8_t mStatus8Staleness = 0; ///< Staleness counter for status 8 data.
+
+    VESC_Status_9 mStatus9; ///< VESC status 9 data.
+    bool mStatus9Fresh = false; ///< Flag to indicate if status 9 data is fresh.
+    uint8_t mStatus9Staleness = 0; ///< Staleness counter for status 9 data.
+
+    ros::Subscriber mProbeStatusGrabber; ///< ROS subscriber for probe status messages.
+    ros::Publisher mProbeStatusPublisher; ///< ROS publisher for probe status messages.
 };
 
 #endif //ProbeStatusForwarder_h_

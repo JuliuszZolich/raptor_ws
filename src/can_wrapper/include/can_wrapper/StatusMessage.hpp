@@ -11,26 +11,51 @@ extern "C"
 #include <libVescCan/VESC.h>
 }
 
+/**
+ * @brief Class for handling status messages over CAN bus.
+ */
 class StatusMessage
 {
 public:
-	StatusMessage(const ros::NodeHandle &nh, bool sendOnUpdate = true);
+    /**
+     * @brief Constructor for StatusMessage.
+     * @param nh ROS NodeHandle for communication with ROS.
+     * @param sendOnUpdate Flag to send messages on update.
+     */
+    StatusMessage(const ros::NodeHandle &nh, bool sendOnUpdate = true);
 
-	void sendStatusMessage(const can_wrapper::RoverStatus &msg);
-	void sendStatusMessage();
+    /**
+     * @brief Sends a status message.
+     * @param msg Message containing rover status.
+     */
+    void sendStatusMessage(const can_wrapper::RoverStatus &msg);
+
+    /**
+     * @brief Sends the last status message.
+     */
+    void sendStatusMessage();
 
 private:
-	can_msgs::Frame encodeStatusMessage(const can_wrapper::RoverStatus &msg);
+    /**
+     * @brief Encodes a status message into a CAN frame.
+     * @param msg Rover status message.
+     * @return Encoded CAN frame.
+     */
+    can_msgs::Frame encodeStatusMessage(const can_wrapper::RoverStatus &msg);
 
-	void handleStatusMessage(const can_wrapper::RoverStatus &msg);
+    /**
+     * @brief Handles the reception of a status message.
+     * @param msg Message containing rover status.
+     */
+    void handleStatusMessage(const can_wrapper::RoverStatus &msg);
 
-	ros::NodeHandle mNh;
-	uint32_t mStatusMessageSeq; /**< Sequence number for communication status messages. */
-	bool mSendOnUpdate;		   /**< Flag to send messages on update. */
-	can_wrapper::RoverStatus mLastStatus; /**< Last status message received. */
+    ros::NodeHandle mNh; /**< ROS NodeHandle for communication with ROS. */
+    uint32_t mStatusMessageSeq; /**< Sequence number for communication status messages. */
+    bool mSendOnUpdate; /**< Flag to send messages on update. */
+    can_wrapper::RoverStatus mLastStatus; /**< Last status message received. */
 
-	ros::Publisher mRawCanPub;		   /**< ROS publisher for raw CAN messages. */
-	ros::Subscriber mStatusMessageSub; /**< ROS subscriber for communication status messages. */
+    ros::Publisher mRawCanPub; /**< ROS publisher for raw CAN messages. */
+    ros::Subscriber mStatusMessageSub; /**< ROS subscriber for communication status messages. */
 };
 
 #endif // STATUSMESSAGE_HPP_
